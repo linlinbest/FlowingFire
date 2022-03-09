@@ -9,6 +9,13 @@ AFire::AFire()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	type = FireType::None;
+
+}
+
+FireType AFire::GetType() const
+{
+	return type;
 }
 
 // Called when the game starts or when spawned
