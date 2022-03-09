@@ -14,11 +14,15 @@ ACombustible::ACombustible()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	fireTypeOnStart = EFireType::None;
+	fireZOffset = 100.f;
 	currFire = nullptr;
 	burningDuration = 5.f;
 	spreadRadius = 200.f;
+	spreadDelay = 3.f;
 
-	burningTimer = 0.f;
+	onFireCooldown = 5.f;
+	onFireCooldownTimer = 0.f;
 
 }
 
@@ -27,35 +31,39 @@ AFire* ACombustible::GetCurrFire() const
 	return currFire;
 }
 
-void ACombustible::SetOnFire(FireType fireType)
+void ACombustible::SetOnFire(EFireType fireType)
 {
-	FVector spawnPos = GetActorLocation();
-	spawnPos.Z += 100.f;
+	if (fireType == EFireType::None || onFireCooldownTimer > 0.f) return;
+
 	if (currFire)
 	{
 		currFire->Destroy();
 	}
 
+	FVector spawnPos = GetActorLocation();
+	spawnPos.Z += fireZOffset;
 	switch (fireType)
 	{
-	case FireType::Red:
+	case EFireType::Red:
 		currFire = GetWorld()->SpawnActor<ARedFire>(redFireToSpawn, spawnPos, GetActorRotation());
 		break;
-	case FireType::Blue:
+	case EFireType::Blue:
 		currFire = GetWorld()->SpawnActor<ABlueFire>(blueFireToSpawn, spawnPos, GetActorRotation());
 		break;
-	case FireType::Yellow:
+	case EFireType::Yellow:
 		currFire = GetWorld()->SpawnActor<AYellowFire>(yellowFireToSpawn, spawnPos, GetActorRotation());
 		break;
 	}
 
-	burningTimer = burningDuration;
+	Burn();
+	GetWorldTimerManager().SetTimer(spreadTimerHandle, this, &ACombustible::Spread, spreadDelay, false);
 
 }
 
 void ACombustible::Spread()
 {
 	if (currFire == nullptr) return;
+
 	TArray<AActor*> overlappedActors;
 	TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
 	traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
@@ -75,26 +83,29 @@ void ACombustible::Spread()
 	}
 }
 
-void ACombustible::Burn(float DeltaTime)
+void ACombustible::Burn()
 {
 	if (currFire == nullptr) return;
 	
-	burningTimer -= DeltaTime;
-	if (burningTimer < 0.f)
-	{
-		for (FireType validFireType : validFire)
-		{
-			if (currFire->GetType() == validFireType)
-			{
-				currFire->Destroy();
-				this->Destroy();
-				return;
-			}
-		}
+	GetWorldTimerManager().SetTimer(burningTimerHandle, this, &ACombustible::BurnOut, burningDuration, false);
+}
 
-		currFire->Destroy();
-		currFire = nullptr;
+void ACombustible::BurnOut()
+{
+	for (EFireType validFireType : validFire)
+	{
+		if (currFire->GetType() == validFireType)
+		{
+			currFire->Destroy();
+			this->Destroy();
+			return;
+		}
 	}
+
+	currFire->Destroy();
+	currFire = nullptr;
+
+	onFireCooldownTimer = onFireCooldown;
 }
 
 // Called when the game starts or when spawned
@@ -102,7 +113,7 @@ void ACombustible::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetOnFire(FireType::Blue);
+	SetOnFire(fireTypeOnStart);
 }
 
 // Called every frame
@@ -110,8 +121,6 @@ void ACombustible::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	Burn(DeltaTime);
-	Spread();
-
+	if (onFireCooldownTimer > 0.f) onFireCooldownTimer -= DeltaTime;
 }
 

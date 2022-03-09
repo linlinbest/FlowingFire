@@ -16,14 +16,27 @@ class FLOWINGFIRE_API ACombustible : public AActor
 protected:
 	// Types of fire which can destroy this combustible.
 	UPROPERTY(EditAnywhere)
-	TArray<FireType> validFire;
+	TArray<EFireType> validFire;
+
+	UPROPERTY(EditAnywhere)
+	EFireType fireTypeOnStart;
+
+	UPROPERTY(EditDefaultsOnly)
+	float fireZOffset;
 
 	UPROPERTY(EditAnywhere)
 	float burningDuration;
 
+	UPROPERTY(EditAnywhere)
+	float onFireCooldown;
+
 	// Radius of spreading fire to other combustibles
 	UPROPERTY(EditAnywhere)
 	float spreadRadius;
+
+	// The time it takes to spread fire
+	UPROPERTY(EditAnywhere)
+	float spreadDelay;
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "FireToSpawn")
@@ -37,7 +50,9 @@ protected:
 
 	AFire* currFire;
 
-	float burningTimer;
+	FTimerHandle burningTimerHandle;
+	FTimerHandle spreadTimerHandle;
+	float onFireCooldownTimer;
 
 public:
 	// Sets default values for this actor's properties
@@ -45,10 +60,12 @@ public:
 
 	AFire* GetCurrFire() const;
 
-	void SetOnFire(FireType fireType);
+	UFUNCTION(BlueprintCallable)
+	void SetOnFire(EFireType fireType);
 
 private:
-	void Burn(float DeltaTime);
+	void Burn();
+	void BurnOut();
 	void Spread();
 
 protected:
