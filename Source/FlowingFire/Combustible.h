@@ -67,6 +67,9 @@ private:
 	void Burn();
 	void BurnOut();
 	void Spread();
+	//Hanlin Added in 3/10
+	//startObj was the ray start with
+	void CombustibleObjRayCast(AActor* startObj,AActor* targetObj,bool& hitCombustible);
 
 protected:
 	// Called when the game starts or when spawned

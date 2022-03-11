@@ -8,6 +8,11 @@
 
 #include "Kismet/KismetSystemLibrary.h"
 
+//Hanlin add includes:
+#include "Engine/World.h"
+#include "GameFrameWork/Actor.h"
+#include "DrawDebugHelpers.h"
+
 // Sets default values
 ACombustible::ACombustible()
 {
@@ -63,7 +68,7 @@ void ACombustible::SetOnFire(EFireType fireType)
 void ACombustible::Spread()
 {
 	if (currFire == nullptr) return;
-
+	bool hitCombustible;
 	TArray<AActor*> overlappedActors;
 	TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
 	traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
@@ -75,10 +80,24 @@ void ACombustible::Spread()
 		traceObjectTypes, nullptr, ignoreActors, overlappedActors);
 
 	for (AActor* overlappedActor : overlappedActors) {
+		
 		ACombustible* overlappedCombustible = Cast<ACombustible>(overlappedActor);
+
 		if (overlappedCombustible && overlappedCombustible->GetCurrFire() == nullptr)
 		{
-			overlappedCombustible->SetOnFire(currFire->GetType());
+			//Hanlin added: do the raycast between two objects
+			CombustibleObjRayCast(this, overlappedCombustible, hitCombustible);
+			if (hitCombustible)
+			{
+				//Debug
+				UKismetSystemLibrary::PrintString(this, TEXT("Ignite successful"), true,false,FColor::Blue,3.0f);
+				overlappedCombustible->SetOnFire(currFire->GetType());
+			}
+			else
+			{
+				//Debug
+				UKismetSystemLibrary::PrintString(this, TEXT("Ignite unsuccessful"), true, false, FColor::Red, 3.0f);
+			}
 		}
 	}
 }
@@ -122,5 +141,45 @@ void ACombustible::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (onFireCooldownTimer > 0.f) onFireCooldownTimer -= DeltaTime;
+}
+
+//Hanlin Added in 3/10
+void ACombustible::CombustibleObjRayCast(AActor* startObj, AActor* targetObj, bool& hitCombustible)
+{
+	FVector startPoint = startObj->GetActorLocation();
+	FVector endPoint = targetObj->GetActorLocation();
+	FVector rayDir = endPoint - startPoint;
+	rayDir = rayDir.GetSafeNormal();
+	startPoint = startPoint + rayDir * 90;
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, startPoint.ToString());
+
+	FHitResult hit;
+
+	if (GetWorld())
+	{
+		bool actorHit = GetWorld()->LineTraceSingleByChannel(hit, startPoint, endPoint, ECC_Pawn, FCollisionQueryParams(), FCollisionResponseParams());
+
+		if (actorHit&&hit.GetActor())
+		{
+			if (hit.GetActor() == targetObj)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, hit.GetActor()->GetFName().ToString());
+				hitCombustible = true;
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, hit.GetActor()->GetFName().ToString());
+				hitCombustible = false;
+			}
+		}
+
+		//Debug
+		if (hitCombustible)
+		{
+			DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 3.f, 0.f, 5.f);
+		}
+		else DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Red, false, 3.f, 0.f, 5.f);
+	}
+
 }
 
