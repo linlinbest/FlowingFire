@@ -58,6 +58,7 @@ public:
 	// Sets default values for this actor's properties
 	ACombustible();
 
+	UFUNCTION(BlueprintCallable)
 	AFire* GetCurrFire() const;
 
 	UFUNCTION(BlueprintCallable)
