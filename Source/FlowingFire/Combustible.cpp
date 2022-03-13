@@ -150,14 +150,17 @@ void ACombustible::CombustibleObjRayCast(AActor* startObj, AActor* targetObj, bo
 	FVector endPoint = targetObj->GetActorLocation();
 	FVector rayDir = endPoint - startPoint;
 	rayDir = rayDir.GetSafeNormal();
-	startPoint = startPoint + rayDir * 90;
+	//startPoint = startPoint + rayDir * 60;
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, startPoint.ToString());
 
 	FHitResult hit;
 
 	if (GetWorld())
 	{
-		bool actorHit = GetWorld()->LineTraceSingleByChannel(hit, startPoint, endPoint, ECC_Pawn, FCollisionQueryParams(), FCollisionResponseParams());
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(this);
+
+		bool actorHit = GetWorld()->LineTraceSingleByChannel(hit, startPoint, endPoint, ECC_Pawn, CollisionParams, FCollisionResponseParams());
 
 		if (actorHit&&hit.GetActor())
 		{
