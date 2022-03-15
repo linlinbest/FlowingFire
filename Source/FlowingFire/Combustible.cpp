@@ -61,6 +61,10 @@ void ACombustible::SetOnFire(EFireType fireType)
 
 }
 
+void ACombustible::OnBurnOutEnd()
+{
+}
+
 void ACombustible::Spread()
 {
 	if (currFire == nullptr) return;
@@ -112,7 +116,8 @@ void ACombustible::BurnOut()
 		if (currFire->GetType() == validFireType)
 		{
 			currFire->Destroy();
-			this->Destroy();
+			//this->Destroy();
+			ReceiveOnBurnOutEnd();
 			return;
 		}
 	}

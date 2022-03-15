@@ -64,6 +64,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetOnFire(EFireType fireType);
 
+	virtual void OnBurnOutEnd();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnBurnOutEnd"))
+	void ReceiveOnBurnOutEnd();
+
 private:
 	void Burn();
 	void BurnOut();
