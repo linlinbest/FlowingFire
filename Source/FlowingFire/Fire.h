@@ -6,14 +6,20 @@
 #include "GameFramework/Actor.h"
 #include "Fire.generated.h"
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValueAsMaskValuesInEditor = "true"))
 enum class EFireType : uint8
 {
-	None      UMETA(DisplayName = "None"),
-	Red       UMETA(DisplayName = "Red"),
-	Blue      UMETA(DisplayName = "Blue"),
-	Yellow    UMETA(DisplayName = "Yellow")
+	None     = 0            UMETA(DisplayName = "None"),
+	Red      = 1 << 0       UMETA(DisplayName = "Red"),
+	Blue     = 1 << 1       UMETA(DisplayName = "Blue"),
+	Yellow   = 1 << 2       UMETA(DisplayName = "Yellow"),
+	Purple   = Red | Blue   UMETA(DisplayName = "Purple"),
+	Orange   = Red | Yellow UMETA(DisplayName = "Orange"),
+	Green    = Red | Blue   UMETA(DisplayName = "Green"),
 };
+
+EFireType operator|(EFireType lhs, EFireType rhs);
+
 
 UCLASS()
 class FLOWINGFIRE_API AFire : public AActor
@@ -21,6 +27,7 @@ class FLOWINGFIRE_API AFire : public AActor
 	GENERATED_BODY()
 	
 protected:
+	UPROPERTY(EditAnywhere)
 	EFireType type;
 
 public:	
@@ -29,6 +36,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	EFireType GetType() const;
+
+	UFUNCTION(BlueprintCallable)
+	EFireType Merge(EFireType typeBeforeMerge) const;
 
 protected:
 	// Called when the game starts or when spawned

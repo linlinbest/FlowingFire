@@ -3,6 +3,12 @@
 
 #include "Fire.h"
 
+EFireType operator|(EFireType lhs, EFireType rhs)
+{
+	return static_cast<EFireType>(static_cast<uint8>(lhs) |
+		static_cast<uint8>(rhs));
+}
+
 // Sets default values
 AFire::AFire()
 {
@@ -16,6 +22,11 @@ AFire::AFire()
 EFireType AFire::GetType() const
 {
 	return type;
+}
+
+EFireType AFire::Merge(EFireType typeBeforeMerge) const
+{
+	return type | typeBeforeMerge;
 }
 
 // Called when the game starts or when spawned

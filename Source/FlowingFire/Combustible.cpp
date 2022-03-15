@@ -2,10 +2,6 @@
 
 #include "Combustible.h"
 
-#include "RedFire.h"
-#include "BlueFire.h"
-#include "YellowFire.h"
-
 #include "Kismet/KismetSystemLibrary.h"
 
 //Hanlin add includes:
@@ -50,13 +46,13 @@ void ACombustible::SetOnFire(EFireType fireType)
 	switch (fireType)
 	{
 	case EFireType::Red:
-		currFire = GetWorld()->SpawnActor<ARedFire>(redFireToSpawn, spawnPos, GetActorRotation());
+		currFire = GetWorld()->SpawnActor<AFire>(redFireToSpawn, spawnPos, GetActorRotation());
 		break;
 	case EFireType::Blue:
-		currFire = GetWorld()->SpawnActor<ABlueFire>(blueFireToSpawn, spawnPos, GetActorRotation());
+		currFire = GetWorld()->SpawnActor<AFire>(blueFireToSpawn, spawnPos, GetActorRotation());
 		break;
 	case EFireType::Yellow:
-		currFire = GetWorld()->SpawnActor<AYellowFire>(yellowFireToSpawn, spawnPos, GetActorRotation());
+		currFire = GetWorld()->SpawnActor<AFire>(yellowFireToSpawn, spawnPos, GetActorRotation());
 		break;
 	}
 
@@ -90,13 +86,13 @@ void ACombustible::Spread()
 			if (hitCombustible)
 			{
 				//Debug
-				UKismetSystemLibrary::PrintString(this, TEXT("Ignite successful"), true,false,FColor::Blue,3.0f);
+				//UKismetSystemLibrary::PrintString(this, TEXT("Ignite successful"), true,false,FColor::Blue,3.0f);
 				overlappedCombustible->SetOnFire(currFire->GetType());
 			}
 			else
 			{
 				//Debug
-				UKismetSystemLibrary::PrintString(this, TEXT("Ignite unsuccessful"), true, false, FColor::Red, 3.0f);
+				//UKismetSystemLibrary::PrintString(this, TEXT("Ignite unsuccessful"), true, false, FColor::Red, 3.0f);
 			}
 		}
 	}
@@ -151,7 +147,7 @@ void ACombustible::CombustibleObjRayCast(AActor* startObj, AActor* targetObj, bo
 	FVector rayDir = endPoint - startPoint;
 	rayDir = rayDir.GetSafeNormal();
 	//startPoint = startPoint + rayDir * 60;
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, startPoint.ToString());
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, startPoint.ToString());
 
 	FHitResult hit;
 
@@ -166,22 +162,13 @@ void ACombustible::CombustibleObjRayCast(AActor* startObj, AActor* targetObj, bo
 		{
 			if (hit.GetActor() == targetObj)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, hit.GetActor()->GetFName().ToString());
 				hitCombustible = true;
 			}
 			else
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, hit.GetActor()->GetFName().ToString());
 				hitCombustible = false;
 			}
 		}
-
-		//Debug
-		if (hitCombustible)
-		{
-			DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 3.f, 0.f, 5.f);
-		}
-		else DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Red, false, 3.f, 0.f, 5.f);
 	}
 
 }
