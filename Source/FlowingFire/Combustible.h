@@ -15,7 +15,7 @@ class FLOWINGFIRE_API ACombustible : public AActor
 
 protected:
 	// Types of fire which can destroy this combustible.
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<EFireType> validFire;
 
 	UPROPERTY(EditAnywhere)

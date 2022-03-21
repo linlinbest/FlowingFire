@@ -38,6 +38,8 @@ void ACombustible::SetOnFire(EFireType fireType)
 
 	if (currFire)
 	{
+		// avoid meaningless setOnFire
+		if (currFire->GetType() == fireType) return;
 		currFire->Destroy();
 	}
 
@@ -116,6 +118,7 @@ void ACombustible::BurnOut()
 		if (currFire->GetType() == validFireType)
 		{
 			currFire->Destroy();
+			currFire = nullptr;
 			//this->Destroy();
 			ReceiveOnBurnOutEnd();
 			return;
