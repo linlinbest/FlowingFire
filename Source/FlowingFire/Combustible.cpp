@@ -105,6 +105,7 @@ void ACombustible::Spread()
 		}
 	}
 }
+
 void ACombustible::OnBurnOutEnd()
 {
 
@@ -131,10 +132,16 @@ void ACombustible::BurnOut()
 		}
 	}
 
+	
+	if (currFire->GetType() == EFireType::Purple ||
+		currFire->GetType() == EFireType::Orange ||
+		currFire->GetType() == EFireType::Green)
+	{
+		onFireCooldownTimer = onFireCooldown;
+	}
+
 	currFire->Destroy();
 	currFire = nullptr;
-
-	onFireCooldownTimer = onFireCooldown;
 }
 
 // Called when the game starts or when spawned
