@@ -36,18 +36,20 @@ void ACombustible::SetOnFire(EFireType fireType)
 {
 	if (fireType == EFireType::None || onFireCooldownTimer > 0.f) return;
 
-	EFireType currType=fireType; 
+	EFireType mergedType = fireType; 
 	if (currFire)
 	{
 		// avoid meaningless setOnFire
 		if (currFire->GetType() == fireType) return;
-		currType = currFire->Merge(fireType);
+		mergedType = currFire->Merge(fireType);
+		if (currFire->GetType() == mergedType) return;
 		currFire->Destroy();
+		//currFire = nullptr;
 	}
 
 	FVector spawnPos = GetActorLocation();
 	spawnPos.Z += fireZOffset;
-	switch (currType)
+	switch (mergedType)
 	{
 	case EFireType::Red:
 		currFire = GetWorld()->SpawnActor<AFire>(redFireToSpawn, spawnPos, GetActorRotation());
@@ -93,7 +95,7 @@ void ACombustible::Spread()
 		
 		ACombustible* overlappedCombustible = Cast<ACombustible>(overlappedActor);
 
-		if (overlappedCombustible && overlappedCombustible->GetCurrFire() == nullptr)
+		if (overlappedCombustible)
 		{
 			//Hanlin added: do the raycast between two objects
 			CombustibleObjRayCast(this, overlappedCombustible, hitCombustible);
@@ -120,6 +122,10 @@ void ACombustible::Burn()
 
 void ACombustible::BurnOut()
 {
+	if (currFire == nullptr) return;
+
+	onFireCooldownTimer = onFireCooldown;
+
 	for (EFireType validFireType : validFire)
 	{
 		if (currFire->GetType() == validFireType)
@@ -131,14 +137,7 @@ void ACombustible::BurnOut()
 			return;
 		}
 	}
-
 	
-	if (currFire->GetType() == EFireType::Purple ||
-		currFire->GetType() == EFireType::Orange ||
-		currFire->GetType() == EFireType::Green)
-	{
-		onFireCooldownTimer = onFireCooldown;
-	}
 
 	currFire->Destroy();
 	currFire = nullptr;

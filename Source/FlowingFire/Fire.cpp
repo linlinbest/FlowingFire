@@ -9,6 +9,18 @@ EFireType operator|(EFireType lhs, EFireType rhs)
 		static_cast<uint8>(rhs));
 }
 
+unsigned int CountSetBits(EFireType fireType)
+{
+	unsigned int n = static_cast<uint8>(fireType);
+	unsigned int count = 0;
+	while (n)
+	{
+		count += n & 1;
+		n >>= 1;
+	}
+	return count;
+}
+
 // Sets default values
 AFire::AFire()
 {
@@ -26,7 +38,23 @@ EFireType AFire::GetType() const
 
 EFireType AFire::Merge(EFireType typeBeforeMerge) const
 {
-	return type | typeBeforeMerge;
+	EFireType mergedType;
+	// Emerged type of fire will replace basic type, but basic type of fire should
+	// not replace emerged type of fire.
+	if (CountSetBits(type) > CountSetBits(typeBeforeMerge))
+	{
+		mergedType = type;
+	}
+	else if (CountSetBits(type) < CountSetBits(typeBeforeMerge))
+	{
+		mergedType = typeBeforeMerge;
+	}
+	else
+	{
+		mergedType = type | typeBeforeMerge;
+	}
+
+	return mergedType;
 }
 
 // Called when the game starts or when spawned
