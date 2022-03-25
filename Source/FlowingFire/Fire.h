@@ -15,7 +15,7 @@ enum class EFireType : uint8
 	Yellow   = 1 << 2       UMETA(DisplayName = "Yellow"),
 	Purple   = Red | Blue   UMETA(DisplayName = "Purple"),
 	Orange   = Red | Yellow UMETA(DisplayName = "Orange"),
-	Green    = Red | Blue   UMETA(DisplayName = "Green"),
+	Green    = Yellow | Blue   UMETA(DisplayName = "Green"),
 };
 
 EFireType operator|(EFireType lhs, EFireType rhs);
@@ -36,7 +36,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	EFireType GetType() const;
-
+	
 	UFUNCTION(BlueprintCallable)
 	EFireType Merge(EFireType typeBeforeMerge) const;
 

@@ -36,16 +36,18 @@ void ACombustible::SetOnFire(EFireType fireType)
 {
 	if (fireType == EFireType::None || onFireCooldownTimer > 0.f) return;
 
+	EFireType currType=fireType; 
 	if (currFire)
 	{
 		// avoid meaningless setOnFire
 		if (currFire->GetType() == fireType) return;
+		currType = currFire->Merge(fireType);
 		currFire->Destroy();
 	}
 
 	FVector spawnPos = GetActorLocation();
 	spawnPos.Z += fireZOffset;
-	switch (fireType)
+	switch (currType)
 	{
 	case EFireType::Red:
 		currFire = GetWorld()->SpawnActor<AFire>(redFireToSpawn, spawnPos, GetActorRotation());
@@ -56,16 +58,22 @@ void ACombustible::SetOnFire(EFireType fireType)
 	case EFireType::Yellow:
 		currFire = GetWorld()->SpawnActor<AFire>(yellowFireToSpawn, spawnPos, GetActorRotation());
 		break;
+	case EFireType::Green:
+		currFire = GetWorld()->SpawnActor<AFire>(greenFireToSpawn, spawnPos, GetActorRotation());
+		break;
+	case EFireType::Purple:
+		currFire = GetWorld()->SpawnActor<AFire>(purpleFireToSpawn, spawnPos, GetActorRotation());
+		break;
+	case EFireType::Orange:
+		currFire = GetWorld()->SpawnActor<AFire>(orangeFireToSpawn, spawnPos, GetActorRotation());
+		break;
 	}
 
 	Burn();
 	GetWorldTimerManager().SetTimer(spreadTimerHandle, this, &ACombustible::Spread, spreadDelay, false);
-
 }
 
-void ACombustible::OnBurnOutEnd()
-{
-}
+
 
 void ACombustible::Spread()
 {
@@ -92,16 +100,14 @@ void ACombustible::Spread()
 			if (hitCombustible)
 			{
 				//Debug
-				//UKismetSystemLibrary::PrintString(this, TEXT("Ignite successful"), true,false,FColor::Blue,3.0f);
 				overlappedCombustible->SetOnFire(currFire->GetType());
-			}
-			else
-			{
-				//Debug
-				//UKismetSystemLibrary::PrintString(this, TEXT("Ignite unsuccessful"), true, false, FColor::Red, 3.0f);
 			}
 		}
 	}
+}
+void ACombustible::OnBurnOutEnd()
+{
+
 }
 
 void ACombustible::Burn()

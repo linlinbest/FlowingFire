@@ -48,6 +48,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "FireToSpawn")
 	TSubclassOf<AFire> yellowFireToSpawn;
 
+	UPROPERTY(EditDefaultsOnly, Category = "FireToSpawn")
+	TSubclassOf<AFire> purpleFireToSpawn;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FireToSpawn")
+	TSubclassOf<AFire> greenFireToSpawn;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FireToSpawn")
+	TSubclassOf<AFire> orangeFireToSpawn;
+
 	AFire* currFire;
 
 	FTimerHandle burningTimerHandle;
@@ -69,6 +78,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnBurnOutEnd"))
 	void ReceiveOnBurnOutEnd();
 
+
+
 private:
 	void Burn();
 	void BurnOut();
@@ -76,6 +87,7 @@ private:
 	//Hanlin Added in 3/10
 	//startObj was the ray start with
 	void CombustibleObjRayCast(AActor* startObj,AActor* targetObj,bool& hitCombustible);
+	
 
 protected:
 	// Called when the game starts or when spawned
