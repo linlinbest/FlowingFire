@@ -83,6 +83,7 @@ void ACombustible::Spread()
 	bool hitCombustible;
 	TArray<AActor*> overlappedActors;
 	TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
+
 	traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 	// ignore self
 	TArray<AActor*> ignoreActors;
@@ -176,7 +177,7 @@ void ACombustible::CombustibleObjRayCast(AActor* startObj, AActor* targetObj, bo
 		FCollisionQueryParams CollisionParams;
 		CollisionParams.AddIgnoredActor(this);
 
-		bool actorHit = GetWorld()->LineTraceSingleByChannel(hit, startPoint, endPoint, ECC_Pawn, CollisionParams, FCollisionResponseParams());
+		bool actorHit = GetWorld()->LineTraceSingleByChannel(hit, startPoint, endPoint, ECC_WorldDynamic, CollisionParams, FCollisionResponseParams());
 
 		if (actorHit&&hit.GetActor())
 		{
