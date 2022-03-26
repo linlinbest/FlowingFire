@@ -19,6 +19,7 @@ enum class EFireType : uint8
 };
 
 EFireType operator|(EFireType lhs, EFireType rhs);
+unsigned int CountSetBits(EFireType fireType);
 
 
 UCLASS()
