@@ -47,8 +47,9 @@ void ACombustible::SetOnFire(EFireType fireType)
 		currFire = nullptr;
 	}
 
+	// Spawn corresponding type of fire and set scale based on combustible's scale
 	FVector spawnPos = GetActorLocation();
-	spawnPos.Z += fireZOffset;
+	spawnPos.Z += fireZOffset * this->GetActorScale3D().Z;
 	switch (mergedType)
 	{
 	case EFireType::Red:
@@ -71,8 +72,9 @@ void ACombustible::SetOnFire(EFireType fireType)
 		break;
 	default:
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, "Unkown merged fire type!");
-		break;
+		return;
 	}
+	currFire->SetActorScale3D(this->GetActorScale3D());
 
 	Burn();
 	GetWorldTimerManager().SetTimer(spreadTimerHandle, this, &ACombustible::Spread, spreadDelay, false);
