@@ -79,6 +79,12 @@ public:
 	void ReceiveOnBurnOutEnd();
 
 
+	virtual void OnBurnBegin();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnBurnBegin"))
+	void ReceiveOnBurnBegin();
+
+
 
 private:
 	void Burn();

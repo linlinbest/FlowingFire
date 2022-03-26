@@ -44,7 +44,7 @@ void ACombustible::SetOnFire(EFireType fireType)
 		mergedType = currFire->Merge(fireType);
 		if (currFire->GetType() == mergedType) return;
 		currFire->Destroy();
-		//currFire = nullptr;
+		currFire = nullptr;
 	}
 
 	FVector spawnPos = GetActorLocation();
@@ -68,6 +68,9 @@ void ACombustible::SetOnFire(EFireType fireType)
 		break;
 	case EFireType::Orange:
 		currFire = GetWorld()->SpawnActor<AFire>(orangeFireToSpawn, spawnPos, GetActorRotation());
+		break;
+	default:
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, "Unkown merged fire type!");
 		break;
 	}
 
@@ -113,10 +116,16 @@ void ACombustible::OnBurnOutEnd()
 
 }
 
+void ACombustible::OnBurnBegin()
+{
+
+}
+
 void ACombustible::Burn()
 {
 	if (currFire == nullptr) return;
 	
+	ReceiveOnBurnBegin();
 	GetWorldTimerManager().SetTimer(burningTimerHandle, this, &ACombustible::BurnOut, burningDuration, false);
 }
 
