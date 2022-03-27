@@ -44,11 +44,12 @@ void ACombustible::SetOnFire(EFireType fireType)
 		mergedType = currFire->Merge(fireType);
 		if (currFire->GetType() == mergedType) return;
 		currFire->Destroy();
-		//currFire = nullptr;
+		currFire = nullptr;
 	}
 
+	// Spawn corresponding type of fire and set scale based on combustible's scale
 	FVector spawnPos = GetActorLocation();
-	spawnPos.Z += fireZOffset;
+	spawnPos.Z += fireZOffset * this->GetActorScale3D().Z;
 	switch (mergedType)
 	{
 	case EFireType::Red:
@@ -69,7 +70,11 @@ void ACombustible::SetOnFire(EFireType fireType)
 	case EFireType::Orange:
 		currFire = GetWorld()->SpawnActor<AFire>(orangeFireToSpawn, spawnPos, GetActorRotation());
 		break;
+	default:
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, "Unkown merged fire type!");
+		return;
 	}
+	currFire->SetActorScale3D(this->GetActorScale3D());
 
 	Burn();
 	GetWorldTimerManager().SetTimer(spreadTimerHandle, this, &ACombustible::Spread, spreadDelay, false);
@@ -114,10 +119,16 @@ void ACombustible::OnBurnOutEnd()
 
 }
 
+void ACombustible::OnBurnBegin()
+{
+
+}
+
 void ACombustible::Burn()
 {
 	if (currFire == nullptr) return;
 	
+	ReceiveOnBurnBegin();
 	GetWorldTimerManager().SetTimer(burningTimerHandle, this, &ACombustible::BurnOut, burningDuration, false);
 }
 

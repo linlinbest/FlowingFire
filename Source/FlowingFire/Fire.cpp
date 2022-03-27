@@ -36,22 +36,33 @@ EFireType AFire::GetType() const
 	return type;
 }
 
-EFireType AFire::Merge(EFireType typeBeforeMerge) const
+EFireType AFire::Merge(EFireType anotherType) const
 {
 	EFireType mergedType;
-	// Emerged type of fire will replace basic type, but basic type of fire should
-	// not replace emerged type of fire.
-	if (CountSetBits(type) > CountSetBits(typeBeforeMerge))
+	
+	// Basic type of fire has 1 setbit (e.g Red 00000001)
+	// Emerged type of fire has 2 setbits (e.g Purple 00000011)
+	unsigned int currTypeSetBits = CountSetBits(type);
+	unsigned int anotherTypeSetBits = CountSetBits(anotherType);
+
+	// Emerged type of fire don't merge to a new type
+	if (currTypeSetBits >= 2 && anotherTypeSetBits >= 2)
 	{
 		mergedType = type;
 	}
-	else if (CountSetBits(type) < CountSetBits(typeBeforeMerge))
+	// Emerged type of fire will replace basic type
+	else if (currTypeSetBits > anotherTypeSetBits)
 	{
-		mergedType = typeBeforeMerge;
+		mergedType = type;
 	}
+	else if (currTypeSetBits < anotherTypeSetBits)
+	{
+		mergedType = anotherType;
+	}
+	// Basic types of fire merge into a emerged type of fire
 	else
 	{
-		mergedType = type | typeBeforeMerge;
+		mergedType = type | anotherType;
 	}
 
 	return mergedType;
